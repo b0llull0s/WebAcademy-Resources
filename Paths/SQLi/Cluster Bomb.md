@@ -1,0 +1,3 @@
+This technique involves using the Burp Suite Intruder tool with a combination of payload positions. By defining two payload positions, you can iterate through all possible combinations of offsets and character values. The "Cluster bomb" attack type in Burp Suite allows you to generate permutations of payloads and send them simultaneously to the server. §
+
+&answer1=1&answer2=1&answer3=1&answer4=0&answer5=0&answer6=0&good_answers=3 (three answers choose) OR &answer1=0&answer2=1&answer3=0&answer4=0&answer5=1&answer6=1&good_answers=3 (three answers chosen)
