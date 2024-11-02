@@ -26,12 +26,12 @@
 >filename=/var/www/images/../../../etc/passwd
 >```
 >
->>[!tip] Bypassing Techniques 
+>>[!danger] Bypassing Techniques 
 >>- You might be able to use nested traversal sequences, such as `....//` or `....\/`. 
 >>-  You can sometimes bypass sanitization by URL encoding, or even double URL encoding, the `../` characters. This results in `%2e%2e%2f` and `%252e%252e%252f` respectively.
 >>- Various non-standard encodings, such as `..%c0%af` or `..%ef%bc%8f`, may also work.
 >>
->>>[!tip] Null Byte
+>>>[!bug] Null Byte
 >>>- An application may require the user-supplied filename to end with an expected file extension, such as `.png`.
 >>>- In this case, it might be possible to use a null byte to effectively terminate the file path before the required extension:
 >>>```
