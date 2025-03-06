@@ -1,6 +1,7 @@
 // The idea is to check is the price loops back after exceeding the maximum value permitted for an integer in the back-end programming language (2,147,483,647).
 // Different shops might use different parameter names like item_id instead of productId or qty instead of quantity.
 // So you might need to adjust this based on what you see in the network requests when manually adding items to the cart.
+// Example: go run overflow.go -url "https://0aa9003d04a06afa82cfe25600c20014.web-security-academy.net/cart" -cookie "3hX0h01AH7eRwgfgSToGzeJQLKuf71Dm" -productid "1" -count 323
 
 package main
 
