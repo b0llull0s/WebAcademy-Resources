@@ -118,4 +118,50 @@
 - [ ] Test other authentication workflows for similar vulnerabilities.
 ### Infinite money logic flaw
 
-
+### Authentication Bypass via Encryption Oracle
+#### Initial Reconnaissance
+- [ ] Identify authentication mechanisms on the target application
+- [ ] Enable "Remember me" or "Stay logged in" features if available
+- [ ] Capture and analyze all related cookies and session identifiers
+- [ ] Examine the format and encoding of authentication cookies
+- [ ] Test for reflection of input in error messages or responses
+#### Encryption Oracle Identification
+- [ ] Look for encrypted cookies in the application (Base64-encoded values are common)
+- [ ] Find functionality that returns errors containing reflected user input
+- [ ] Test input validation functions (especially email, username fields)
+- [ ] Identify endpoints that process and reflect encrypted data
+- [ ] Analyze error messages for cryptographic implementation details
+#### Encryption/Decryption Testing
+- [ ] Set up request sequences to:
+- [ ] Encrypt arbitrary data via input fields
+- [ ] Decrypt values via reflected error messages
+- [ ] Determine the encryption algorithm used (block cipher vs stream cipher)
+- [ ] Identify block size if using a block cipher (commonly 16 bytes for AES)
+- [ ] Test for padding requirements and analyze padding errors
+#### Cookie Structure Analysis
+- [ ] Decrypt authentication cookies to understand their structure
+- [ ] Identify components (username, timestamp, role, etc.)
+- [ ] Determine format requirements for valid cookies
+- [ ] Test validity periods or timestamp requirements
+#### Exploitation Preparation
+- [ ] Create crafted payloads with privileged user identifiers
+- [ ] Handle any prefixes/suffixes added during encryption/decryption
+- [ ] Calculate necessary padding to align with encryption block boundaries
+- [ ] Test encryption/decryption of modified payloads
+#### Circumvention Techniques
+- [ ] Develop methods to remove unwanted prefixes from decrypted output
+- [ ] Craft payloads that survive encryption/decryption cycles
+- [ ] Prepare custom cookies with elevated privileges
+- [ ] Test cookie manipulation techniques on non-critical endpoints
+#### Access Verification
+- [ ] Replace session cookies with crafted values
+- [ ] Test access to privileged functions or admin areas
+- [ ] Verify successful authentication as target user
+- [ ] Document the vulnerability with proof of access
+#### Security Report Documentation
+- [ ] Document the encryption oracle vulnerability
+- [ ] Capture complete HTTP request/response pairs
+- [ ] Note specific headers, parameters, and cookies involved
+- [ ] Provide clear reproduction steps
+- [ ] Suggest remediation approaches for the vulnerability
+### Email address parser discrepancies
