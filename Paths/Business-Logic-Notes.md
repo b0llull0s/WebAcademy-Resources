@@ -2,7 +2,9 @@
 >- Business logic vulnerabilities are flaws in the design and implementation of an application that allow an attacker to elicit unintended behavior.
 >- This potentially enables attackers to manipulate legitimate functionality to achieve a malicious goal.
 >- These flaws are generally the result of failing to anticipate unusual application states that may occur and, consequently, failing to handle them safely.
-- [PortSwigger Examples](https://portswigger.net/web-security/logic-flaws/examples)
+
+>[!important] PortSwigger Labs
+>- [Link](https://portswigger.net/web-security/logic-flaws/examples)
 ### Excesive Trust
 
 - [ ] Check if the server properly validates user input
@@ -117,51 +119,171 @@
 - [ ] Look for unexpected behavior or errors in the response.
 - [ ] Test other authentication workflows for similar vulnerabilities.
 ### Infinite money logic flaw
-
+##### Initial Discovery & Validation
+- [ ] Log in to the target application
+- [ ] Sign up for newsletter to obtain coupon codes (e.g., `SIGNUP30`)
+- [ ] Investigate gift card functionality
+- [ ] Check if gift cards can be purchased
+- [ ] Verify if gift cards can be redeemed for store credit
+- [ ] Note the denominations available for gift cards
+##### Proof of Concept
+- [ ] Add a gift card to basket
+- [ ] Apply coupon code at checkout
+- [ ] Calculate potential profit margin (e.g., 30% discount = $3 profit on $10 card)
+- [ ] Complete purchase and record gift card code
+- [ ] Redeem gift card on account page
+- [ ] Verify store credit increase matches expected profit
+##### Request Analysis
+- [ ] Study proxy history for relevant requests
+- [ ] Identify key requests in the gift card purchase flow
+- [ ] Document the redemption endpoint (e.g., `POST /gift-card`)
+- [ ] Note parameters required for redemption (e.g., `gift-card` parameter)
+##### Automation Setup
+- [ ] Configure session handling rules in testing tool
+- [ ] Set appropriate URL scope
+- [ ] Create macro for the full exploitation chain
+- [ ] Record sequence of necessary requests:
+- [ ] Add to cart request
+- [ ] Apply coupon request
+- [ ] Checkout request
+- [ ] Order confirmation request
+- [ ] Gift card redemption request
+##### Parameter Extraction
+- [ ] Configure order confirmation request to extract gift card code
+- [ ] Create custom parameter for the gift card code
+- [ ] Test extraction works correctly
+- [ ] Configure gift card redemption request
+- [ ] Set gift-card parameter to use extracted value
+- [ ] Verify parameter is correctly populated
+##### Exploitation
+- [ ] Test macro to ensure full chain works correctly
+- [ ] Set up automated attack
+- [ ] Configure appropriate attack type (e.g., Sniper with Null payloads)
+- [ ] Set number of iterations based on credit needed
+- [ ] Configure resource pool with rate limiting if needed
+- [ ] Run attack and monitor progress
+- [ ] Verify store credit accumulation
+##### Documentation
+- [ ] Calculate exact profit per iteration
+- [ ] Document time required for exploitation
+- [ ] Note any rate limiting or anti-automation defenses encountered
+- [ ] Record application behavior throughout the process
+- [ ] Document potential fixes for the vulnerability
 ### Authentication Bypass via Encryption Oracle
-#### Initial Reconnaissance
+##### Initial Reconnaissance
 - [ ] Identify authentication mechanisms on the target application
 - [ ] Enable "Remember me" or "Stay logged in" features if available
 - [ ] Capture and analyze all related cookies and session identifiers
 - [ ] Examine the format and encoding of authentication cookies
 - [ ] Test for reflection of input in error messages or responses
-#### Encryption Oracle Identification
+##### Encryption Oracle Identification
 - [ ] Look for encrypted cookies in the application (Base64-encoded values are common)
 - [ ] Find functionality that returns errors containing reflected user input
 - [ ] Test input validation functions (especially email, username fields)
 - [ ] Identify endpoints that process and reflect encrypted data
 - [ ] Analyze error messages for cryptographic implementation details
-#### Encryption/Decryption Testing
+##### Encryption/Decryption Testing
 - [ ] Set up request sequences to:
 - [ ] Encrypt arbitrary data via input fields
 - [ ] Decrypt values via reflected error messages
 - [ ] Determine the encryption algorithm used (block cipher vs stream cipher)
 - [ ] Identify block size if using a block cipher (commonly 16 bytes for AES)
 - [ ] Test for padding requirements and analyze padding errors
-#### Cookie Structure Analysis
+##### Cookie Structure Analysis
 - [ ] Decrypt authentication cookies to understand their structure
 - [ ] Identify components (username, timestamp, role, etc.)
 - [ ] Determine format requirements for valid cookies
 - [ ] Test validity periods or timestamp requirements
-#### Exploitation Preparation
+##### Exploitation Preparation
 - [ ] Create crafted payloads with privileged user identifiers
 - [ ] Handle any prefixes/suffixes added during encryption/decryption
 - [ ] Calculate necessary padding to align with encryption block boundaries
 - [ ] Test encryption/decryption of modified payloads
-#### Circumvention Techniques
+##### Circumvention Techniques
 - [ ] Develop methods to remove unwanted prefixes from decrypted output
 - [ ] Craft payloads that survive encryption/decryption cycles
 - [ ] Prepare custom cookies with elevated privileges
 - [ ] Test cookie manipulation techniques on non-critical endpoints
-#### Access Verification
+##### Access Verification
 - [ ] Replace session cookies with crafted values
 - [ ] Test access to privileged functions or admin areas
 - [ ] Verify successful authentication as target user
 - [ ] Document the vulnerability with proof of access
-#### Security Report Documentation
+##### Security Report Documentation
 - [ ] Document the encryption oracle vulnerability
 - [ ] Capture complete HTTP request/response pairs
 - [ ] Note specific headers, parameters, and cookies involved
 - [ ] Provide clear reproduction steps
 - [ ] Suggest remediation approaches for the vulnerability
 ### Email address parser discrepancies
+
+>[!important]
+>- [Paper](https://portswigger.net/research/splitting-the-email-atom)
+##### Initial Reconnaissance
+- [ ] Identify if the application has any email-based features (registration, password reset, etc.)
+- [ ] Determine if the application restricts access based on email domains
+- [ ] Check if different parts of the application verify email addresses differently
+- [ ] Identify the tech stack/framework (Ruby gems like 'Mail' are particularly vulnerable)
+- [ ] Look for email verification processes (confirmation links, magic links)
+##### Testing for Basic Parsing Vulnerabilities
+- [ ] Test standard RFC-compliant but unusual email formats:
+    - [ ] Quoted local parts: `"user@internal"@external.com`
+    - [ ] Comments: `user(comment)@example.com` or `user@(comment)example.com`
+    - [ ] UUCP addresses: `external.com!user@example.com`
+    - [ ] Source routing: `user%internal.com@external.com`
+    - [ ] Escaped characters: `user\"@internal\"@external.com`
+##### Testing for Unicode Overflow Vulnerabilities
+- [ ] Test for unicode characters that might overflow into ASCII:
+    - [ ] Try `String.fromCodePoint(0x100 + 0x40)` which can generate `@`
+    - [ ] Test higher unicode characters (0x1000, 0x10000)
+    - [ ] Look for any character that might generate desired special characters
+##### Testing for Encoded-Word Vulnerabilities
+- [ ] Test basic encoded-word probes:
+    - [ ] `=?utf-8?q?=61=62=63?=collab@example.com` (decodes to `abccollab@example.com`)
+    - [ ] `=?iso-8859-1?q?=61=62=63?=collab@example.com`
+    - [ ] Check SMTP interactions to verify if decoding happens
+- [ ] Test various charset encodings:
+    - [ ] UTF-8: `=?utf-8?q?=40?=@example.com` (@ symbol)
+    - [ ] UTF-7: `=?utf-7?q?&AEA-?=@example.com` (@ symbol)
+    - [ ] ISO-8859-1: `=?iso-8859-1?q?=40?=@example.com`
+    - [ ] Less common charsets that might bypass filters
+- [ ] Test nested/combined encoding techniques:
+    - [ ] UTF-7 + Q-Encoding: `=?utf-7?q?&AEA-?=@example.com`
+    - [ ] Base64 encoding: `=?utf-8?b?QEA=?=@example.com` (@@)
+    - [ ] UTF-7 + Base64: `=?utf-7?b?JkFFQS0=?=@example.com` (@)
+- [ ] Test email splitting attacks:
+    - [ ] `=?x?q?collab=40target.com=3e=00?=foo@allowed.com`
+    - [ ] `=?iso-8859-1?q?user=40attacker.com=3e=20?=@allowed.com`
+    - [ ] `=?utf-7?q?attacker&AEA-exploit-server&ACA-?=@allowed.com`
+##### Testing for Punycode Vulnerabilities
+- [ ] Test basic Punycode handling:
+    - [ ] `user@xn--mnchen-3ya.com` (münchen.com)
+    - [ ] Check if the application properly displays/interprets Punycode domains
+- [ ] Test malformed Punycode:
+    - [ ] `user@xn--0049.com` (decodes to a comma)
+    - [ ] `user@xn--0117.example.com` (might decode to `@@.example.com`)
+    - [ ] `user@xn--svg/-9x6.com` (might decode to `<svg/`)
+##### Exploitation Techniques
+- [ ] For each successful parsing discrepancy:
+    - [ ] Attempt to register with a bypassed domain
+    - [ ] Check if confirmation emails are sent to your controlled domain
+    - [ ] Test if the application applies different parsing for confirmation vs. display
+    - [ ] Check if you can gain access to restricted areas after confirmation
+- [ ] For potential XSS via Punycode:
+    - [ ] Test if malformed Punycode can generate HTML tags
+    - [ ] Test if HTML escaping is applied before or after Punycode decoding
+    - [ ] Chain with other attack vectors (like CSS exfiltration)
+##### Validation and Verification
+- [ ] Document successful attacks with screenshots and request/response data
+- [ ] Assess the impact (unauthorized access, privilege escalation, data access)
+- [ ] Test the attack in different contexts within the application
+- [ ] Check if the attack works across different authentication flows
+##### Tools to Use
+- [ ] Email interaction capturing tools (Burp Collaborator, webhook.site)
+- [ ] Encoding/decoding tools for various email formats
+- [ ] Hackvertor tags for testing unicode overflows and encoded-word attacks:
+    - [ ] `<@_unicode_overflow(0x100,'...')>@</@_unicode_overflow>`
+    - [ ] `<@_encoded_word_encode('...')>@<@/_encoded_word_encode>`
+    - [ ] `<@_email_utf7('...')><@/_email_utf7>`
+- [ ] Turbo Intruder for automating tests against various encodings
+- [ ] Punycode fuzzer for discovering malformed Punycode issues
