@@ -219,9 +219,10 @@
 
 >[!important]
 >- [Paper](https://portswigger.net/research/splitting-the-email-atom)
+>- [UUCP Protocol](https://www.jochentopf.com/email/address.html#uucp)
 ##### Initial Reconnaissance
-- [ ] Identify if the application has any email-based features (registration, password reset, etc.)
-- [ ] Determine if the application restricts access based on email domains
+- [x] Identify if the application has any email-based features (registration, password reset, etc.)
+- [x] Determine if the application restricts access based on email domains
 - [ ] Check if different parts of the application verify email addresses differently
 - [ ] Identify the tech stack/framework (Ruby gems like 'Mail' are particularly vulnerable)
 - [ ] Look for email verification processes (confirmation links, magic links)
